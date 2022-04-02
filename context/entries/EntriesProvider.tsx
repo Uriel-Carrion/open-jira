@@ -1,38 +1,48 @@
 import { FC, useEffect, useReducer } from "react";
-import { EntriesContext, entriesReducer } from "./";
-import { Entry } from "../../interfaces";
+
+import { useSnackbar } from "notistack";
+
 import { entriesApi } from "../../apis";
+import { Entry } from "../../interfaces";
+import { EntriesContext, entriesReducer } from "./";
 
 export interface EntriesState {
   entries: Entry[];
 }
 
-const ENTRIES_INITIAL_STATE: EntriesState = {
+const Entries_INITIAL_STATE: EntriesState = {
   entries: [],
 };
 
 export const EntriesProvider: FC = ({ children }) => {
-  const [state, dispatch] = useReducer(entriesReducer, ENTRIES_INITIAL_STATE);
+  const [state, dispatch] = useReducer(entriesReducer, Entries_INITIAL_STATE);
+  const { enqueueSnackbar } = useSnackbar();
 
   const addEntry = async (description: string) => {
-    // const newEntry: Entry = {
-    //   _id: uuidv4(),
-    //   description,
-    //   createAt: Date.now(),
-    //   status: "pending",
-    // };
-
     const { data } = await entriesApi.post<Entry>("/entries", { description });
     dispatch({ type: "[Entry] - add-Entry", payload: data });
   };
 
-  const updateEntry = async ({ _id, description, status }: Entry) => {
+  const updateEntry = async (
+    { _id, description, status }: Entry,
+    showSnackbar = false
+  ) => {
     try {
       const { data } = await entriesApi.put<Entry>(`/entries/${_id}`, {
         description,
         status,
       });
       dispatch({ type: "[Entry] - Update-Entry", payload: data });
+
+      if (showSnackbar)
+        enqueueSnackbar("Entrada actualizada", {
+          variant: "success",
+          autoHideDuration: 1500,
+          anchorOrigin: {
+            vertical: "top",
+            horizontal: "right",
+          },
+        });
     } catch (error) {
       console.log({ error });
     }
@@ -51,7 +61,8 @@ export const EntriesProvider: FC = ({ children }) => {
     <EntriesContext.Provider
       value={{
         ...state,
-        //methods
+
+        // Methods
         addEntry,
         updateEntry,
       }}
