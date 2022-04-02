@@ -6,6 +6,7 @@ interface ContextProps {
   addEntry: (description: string) => void;
 
   updateEntry: (entry: Entry, showSnackbar?: boolean) => void;
+  deleteEntry: (entry: Entry) => void;
 }
 
 export const EntriesContext = createContext({} as ContextProps);

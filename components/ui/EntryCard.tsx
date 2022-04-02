@@ -17,6 +17,8 @@ export const EntryCard:FC<Props>= ({ entry }) => {
     const { startDragging, endDragging } = useContext( UIContext );
     const router = useRouter()
 
+
+
     const onDragStart = ( event: DragEvent ) => {
         event.dataTransfer.setData('text', entry._id );
 
@@ -47,7 +49,7 @@ export const EntryCard:FC<Props>= ({ entry }) => {
             </CardContent>
 
             <CardActions sx={{ display: 'flex', justifyContent: 'end', paddingRight: 2 }}>
-                <Typography variant='body2'>{ dateFunctions.getFormatDistanceToNow( entry.createdAt ) }</Typography>
+                <Typography variant='body2'>{ dateFunctions.getFormatDistanceToNow( entry.createAt ) }</Typography>
             </CardActions>
         </CardActionArea>
     </Card>

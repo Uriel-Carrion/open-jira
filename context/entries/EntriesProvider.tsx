@@ -5,6 +5,7 @@ import { useSnackbar } from "notistack";
 import { entriesApi } from "../../apis";
 import { Entry } from "../../interfaces";
 import { EntriesContext, entriesReducer } from "./";
+import { useRouter } from "next/router";
 
 export interface EntriesState {
   entries: Entry[];
@@ -17,6 +18,7 @@ const Entries_INITIAL_STATE: EntriesState = {
 export const EntriesProvider: FC = ({ children }) => {
   const [state, dispatch] = useReducer(entriesReducer, Entries_INITIAL_STATE);
   const { enqueueSnackbar } = useSnackbar();
+  const router = useRouter();
 
   const addEntry = async (description: string) => {
     const { data } = await entriesApi.post<Entry>("/entries", { description });
@@ -35,7 +37,7 @@ export const EntriesProvider: FC = ({ children }) => {
       dispatch({ type: "[Entry] - Update-Entry", payload: data });
 
       if (showSnackbar)
-        enqueueSnackbar("Entrada actualizada", {
+        enqueueSnackbar("Entrada eliminada", {
           variant: "success",
           autoHideDuration: 1500,
           anchorOrigin: {
@@ -43,6 +45,25 @@ export const EntriesProvider: FC = ({ children }) => {
             horizontal: "right",
           },
         });
+      router.push("/");
+    } catch (error) {
+      console.log({ error });
+    }
+  };
+  const deleteEntry = async ({ _id }: Entry) => {
+    try {
+      const { data } = await entriesApi.delete<Entry>(`/entries/${_id}`, {});
+      // dispatch({ type: "[Entry] - Update-Entry", payload: data });
+
+      enqueueSnackbar("Entrada actualizada", {
+        variant: "success",
+        autoHideDuration: 1500,
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
+        },
+      });
+      router.push("/");
     } catch (error) {
       console.log({ error });
     }
@@ -65,6 +86,7 @@ export const EntriesProvider: FC = ({ children }) => {
         // Methods
         addEntry,
         updateEntry,
+        deleteEntry
       }}
     >
       {children}
